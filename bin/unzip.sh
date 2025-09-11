@@ -11,62 +11,63 @@ if [[ $# -eq 0 ]]; then
   exit 1
 fi
 
+# Ellenőrizzük, hogy az unzip elérhető-e
+if ! command -v unzip >/dev/null 2>&1; then
+  echo "Hiba: az 'unzip' nincs telepítve vagy nem elérhető a PATH-ban." >&2
+  exit 2
+fi
 
 for i in "$@"; do
-    #if [[ "$i" =~ ^[+-]?[0-9]+$ ]]; then
-    #    if (( 10#$i == 0 )); then
-    #        echo "nulla"
-    #    fi
-    #else
-    #if [ "${i:(-4)}" = ".zip" ]; then
-    #    d="${i%/*}"
-    #    cd "$d"
-    #    n="${i##*/}" #echo "${i##*/}" | sed 's/\.zip$//'
-    #    n="${n%????}"
-    #    mkdir -p "$n"
-        #cd "${i%????}"
-    #    cd "$n"
-    #    if unzip "$i"; then rm "$i"; fi
-    #continue
-  fi
+  # Kiterjesztés ellenőrzése (case-insensitive)
+  zip_file_basename="$(basename -- "$i" 2>/dev/null || basename "$i")"
+  case "$zip_file_basename" in
+    *.zip|*.ZIP|*.Zip|*.zIp|*.ziP|*.ZIp|*.ZiP|*.zIP) ;;
+    *)
+      echo "Kihagyva (nem ZIP): $i" >&2
+      continue
+      ;;
+  esac
 
-  dir_name="$(dirname -- "$i")"
-  # Belépünk abba a könyvtárba, ahol a ZIP van (így a relatív utak stabilak)
+  # Könyvtár és alapnév
+  dir_name="$(dirname -- "$i" 2>/dev/null || dirname "$i")"
+
+  # Belépés a ZIP helyére
   if ! pushd "$dir_name" >/dev/null; then
     echo "Hiba: nem lehet belépni: $dir_name" >&2
     continue
   fi
 
-  # Célkönyvtár neve: fájlnév kiterjesztés nélkül
-  zip_file="$(basename -- "$i")"     # pl. valami.Archive.ZIP
-  name_no_ext="${zip_file%.*}"       # pl. valami.Archive
+  zip_file="$zip_file_basename"
 
-  # Létrehozzuk a cél mappát (ha létezik, nem baj)
+  # Célkönyvtár név: vágjuk le a .zip-et (case-insensitive)
+  name_no_ext="${zip_file%.[Zz][Ii][Pp]}"
+  if [[ -z "$name_no_ext" ]]; then
+    echo "Hiba: érvénytelen fájlnév a könyvtárhoz: $zip_file" >&2
+    popd >/dev/null
+    continue
+  fi
+
   if ! mkdir -p -- "$name_no_ext"; then
     echo "Hiba: nem hozható létre könyvtár: $name_no_ext" >&2
     popd >/dev/null
     continue
   fi
 
-  # Kicsomagolás a célkönyvtárba
   if ! pushd -- "$name_no_ext" >/dev/null; then
     echo "Hiba: nem lehet belépni a könyvtárba: $name_no_ext" >&2
     popd >/dev/null
     continue
   fi
 
-  # Csendes kicsomagolás (-q). Ha sikertelen, nem törlünk.
-  if unzip -q -- "../$zip_file"; then
-    # Siker esetén töröljük az eredeti ZIP-et
+  # Csendes kicsomagolás, felülírás nélküli mód (-n), és NINCS "--"
+  if unzip -q -n "../$zip_file"; then
     if ! rm -f -- "../$zip_file"; then
       echo "Figyelem: nem sikerült törölni a ZIP-et: ../$zip_file" >&2
     fi
   else
     echo "Hiba: sikertelen kicsomagolás: ../$zip_file" >&2
-    # Nem törlünk semmit sikertelen kicsomagolás esetén
   fi
 
-  # Vissza a ZIP helyére, majd az eredeti könyvtárba
   popd >/dev/null
   popd >/dev/null
 done
