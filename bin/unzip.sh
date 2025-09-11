@@ -11,10 +11,9 @@ for i in "$@"; do
         cd "$d"
         n="${i##*/}" #echo "${i##*/}" | sed 's/\.zip$//'
         n="${n%????}"
-        mkdir "$n"
+        mkdir -p "$n"
         #cd "${i%????}"
         cd "$n"
-        unzip "$i"
-        rm "$i"
+        if unzip "$i"; then rm "$i"; fi
     fi
 done
