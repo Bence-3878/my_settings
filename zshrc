@@ -8,7 +8,7 @@ ZSH_THEME="my"
 HYPHEN_INSENSITIVE="true"
 zstyle ':omz:update' mode auto
 zstyle ':omz:update' frequency 7
-zstyle ':omz:plugins:ssh-agent' identities id_ed25519 id_rsa
+zstyle ':omz:plugins:ssh-agent' identities id_ecdsa
 zstyle ':omz:plugins:ssh-agent' lifetime 4h
 zstyle ':omz:plugins:ssh-agent' agent-forwarding on
 zstyle ':omz:plugins:ssh-agent' quiet yes
