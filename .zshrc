@@ -73,8 +73,7 @@ ZSH_CUSTOM=~/mis/zsh
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git sudo zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search web-search 
-virtualenv ) #pyenv-virtualenv)
+plugins=(git sudo zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search web-search virtualenv)
 
 source $ZSH/oh-my-zsh.sh
 
