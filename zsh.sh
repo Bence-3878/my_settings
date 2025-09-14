@@ -11,6 +11,6 @@ ${ZSH_CUSTOM:-~/mis/zsh}/plugins/web-search
 mkdir ~/bin
 
 rm $HOME/.zshrc
-mv $HOME/mis/.zshrc $HOME
+ln -s $HOME/mis/zshrc $HOME/.zshrc
 
 zsh
