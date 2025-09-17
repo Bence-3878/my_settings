@@ -16,7 +16,8 @@ COMPLETION_WAITING_DOTS="true"
 HIST_STAMPS="yyyy-mm-dd"
 ZSH_CUSTOM=~/mis/zsh
 
-plugins=(git sudo zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search web-search virtualenv ssh ssh-agent)
+plugins=(git sudo zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search \
+web-search virtualenv ssh ssh-agent copyfile z) ## autojump)
 source $ZSH/oh-my-zsh.sh
 source "$ZSH_CUSTOM/aliases.zsh"
 
