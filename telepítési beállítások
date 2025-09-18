@@ -33,7 +33,7 @@ DRIVE
 
 mkdir ~/asus
 
-git clone https://github.com/asus-linux-drivers/asus-numberpad-driver ${ASUS_NUMBERPAD:-~/asus}/asus-numberpad-driver
+git clone https://github.com/asus-linux-drivers/asus-numberpad-driver ${ASUS_NUMBERPAD:-~/}/asus-numberpad-driver
 *****************************************************
 monitor
 
