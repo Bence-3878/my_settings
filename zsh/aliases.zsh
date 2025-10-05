@@ -1,6 +1,9 @@
 alias kra="if [ ! -d \"kra\" ]; then mkdir kra; fi; if [ -d \"*.jpg.kra\" ]; then mv *.jpg.kra kra; fi; if [ -d \"*~\" ]; then rm *~; fi; if [ -d \"kra/*~\" ]; then rm kra/*~; fi;"
 alias clion="nohup ~/JetBrains/CLion/bin/clion.sh &"
 alias pycharm="nohup ~/JetBrains/pycharm/bin/pycharm.sh &"
+alias py="nohup ~/JetBrains/pycharm/bin/pycharm.sh &"
+alias datagrip="nohup ~/JetBrains/Datagrip/bin/datagrip.sh &"
+alias idea="nohup ~/JetBrains/IdeaIU/bin/idea.sh &"
 alias zshconfig="${EDITOR} ~/mis/zshrc"
 alias m=$EDITOR
 alias nano=$EDITOR

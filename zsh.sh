@@ -9,6 +9,8 @@ ${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/web-search \
 ${ZSH_CUSTOM}/plugins/web-search
 git clone https://github.com/agkozak/zsh-z ${ZSH_CUSTOM}/plugins/zsh-z
+git clone https://github.com/zsh-users/zsh-history-substring-search \
+${ZSH_CUSTOM}/plugins/zsh-history-substring-search
 mkdir ~/bin
 
 rm $HOME/.zshrc
