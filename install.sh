@@ -37,6 +37,7 @@ BASE_PKGS=(
   mc zsh git gh curl fzf tree htop btop tmux ranger
   micro unzip inxi speedtest-cli hexedit
   eza fastfetch tealdeer sl gcc clang
+  ripgrep ncdu duf jq trash-cli
 )
 
 # Csak szerverre (pl. RPi)
@@ -48,6 +49,7 @@ SERVER_PKGS=(
 DESKTOP_PKGS=(
   gdb cowsay lolcat w3m bat
   terminator wine git-cola gufw mplayer flatpak
+  flameshot copyq meld syncthing fc-cache
 )
 
 # Csak asztali + X11
@@ -78,23 +80,23 @@ DISTRO_BASE=()
 DISTRO_DESKTOP=()
 case "$PM" in
   apt)
-    DISTRO_BASE=(g++ openssh-server)
-    DISTRO_DESKTOP=(w3m-img fonts-powerline default-jre)
-    sudo apt update && sudo apt upgrade -y
+    DISTRO_BASE=(g++ openssh-server fd-find mtr-tiny)
+    DISTRO_DESKTOP=(w3m-img fonts-powerline default-jre xz-utils)
+    sudo apt update && sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y
     ;;
   dnf)
-    DISTRO_BASE=(gcc-c++ openssh-server)
-    DISTRO_DESKTOP=(powerline-fonts java-latest-openjdk)
+    DISTRO_BASE=(gcc-c++ openssh-server fd-find mtr)
+    DISTRO_DESKTOP=(powerline-fonts java-latest-openjdk xz)
     sudo dnf upgrade -y
     ;;
   pacman)
-    DISTRO_BASE=(openssh)
-    DISTRO_DESKTOP=(powerline-fonts jre-openjdk)
+    DISTRO_BASE=(openssh fd mtr lazygit)
+    DISTRO_DESKTOP=(powerline-fonts jre-openjdk xz)
     sudo pacman -Syu --noconfirm
     ;;
   zypper)
-    DISTRO_BASE=(gcc-c++ openssh)
-    DISTRO_DESKTOP=(powerline-fonts java-21-openjdk)
+    DISTRO_BASE=(gcc-c++ openssh fd mtr lazygit)
+    DISTRO_DESKTOP=(powerline-fonts java-21-openjdk xz)
     sudo zypper refresh && sudo zypper update -y
     ;;
 esac
@@ -166,6 +168,42 @@ install_uex() {
   esac
 }
 
+install_lazygit() {
+  command -v lazygit &>/dev/null && return 0
+  local ver arch
+  ver=$(curl -fsSL "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | jq -r '.tag_name | ltrimstr("v")')
+  case "$(uname -m)" in
+    x86_64)  arch="x86_64" ;;
+    aarch64) arch="arm64" ;;
+    *) echo "lazygit: nem támogatott architektúra"; return 0 ;;
+  esac
+  curl -fsSL "https://github.com/jesseduffield/lazygit/releases/download/v${ver}/lazygit_${ver}_Linux_${arch}.tar.gz" \
+    | sudo tar -xz -C /usr/local/bin lazygit
+}
+
+install_nerd_font() {
+  local font_name="JetBrainsMono"
+  local font_dir="$HOME/.local/share/fonts/$font_name"
+
+  if [[ -d "$font_dir" ]] && [[ -n "$(ls -A "$font_dir" 2>/dev/null)" ]]; then
+    echo "==> $font_name Nerd Font már telepítve van."
+    return 0
+  fi
+
+  echo "==> $font_name Nerd Font telepítése..."
+  mkdir -p "$font_dir"
+  local tmp_file="/tmp/${font_name}.tar.xz"
+
+  if curl -fLsS -o "$tmp_file" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${font_name}.tar.xz"; then
+    tar -xf "$tmp_file" -C "$font_dir"
+    rm -f "$tmp_file"
+    command -v fc-cache &>/dev/null && fc-cache -f "$font_dir"
+  else
+    echo "Figyelmeztetés: $font_name Nerd Font letöltése sikertelen."
+    rm -f "$tmp_file"
+  fi
+}
+
 # Alap csomagok (mindig)
 for pkg in "${BASE_PKGS[@]}" "${DISTRO_BASE[@]}"; do
   install_pkg "$pkg"
@@ -195,6 +233,8 @@ else
 
   install_espanso
   install_uex
+  install_lazygit
+  install_nerd_font
 fi
 
 # --- 5. ZSH ÉS KONFIGOK ---

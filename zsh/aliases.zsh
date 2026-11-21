@@ -9,9 +9,9 @@ alias pycharm='nohup ~/JetBrains/pycharm/bin/pycharm.sh >/dev/null 2>&1 &'
 alias beep="mplayer \"$MY_SETTINGS_DIR/valami/done.mp3\" >/dev/null 2>&1"
 
 # Függvények
-zshconfig() {
-  "$EDITOR" "$MY_SETTINGS_DIR/zshrc"
-}
+#zshconfig() {
+#  "$EDITOR" "$MY_SETTINGS_DIR/zshrc"
+#}
 
 aliases() {
   "$EDITOR" "$MY_SETTINGS_DIR/zsh/aliases.zsh"
@@ -62,3 +62,19 @@ zhelp() {
     printf "  \e[32m%-29s\e[0m %s\n" "$p" "${desc[$p]:-(nincs leírás)}"
   done
 }
+
+# eza (ls helyett)
+if command -v eza &>/dev/null; then
+  alias ls='eza --icons=auto --group-directories-first'
+  alias ll='eza -la --icons=auto --group-directories-first --git'
+  alias lt='eza --tree --level=2 --icons=auto'
+fi
+
+# fd (Debian/Ubuntu alatt fdfind néven fut)
+if command -v fdfind &>/dev/null && ! command -v fd &>/dev/null; then
+  alias fd='fdfind'
+fi
+
+# Egyéb gyorsparancsok
+command -v lazygit &>/dev/null && alias lg='lazygit'
+command -v trash-put &>/dev/null && alias del='trash-put'
