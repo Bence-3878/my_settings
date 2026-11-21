@@ -17,10 +17,18 @@ aliases() {
   "$EDITOR" "$MY_SETTINGS_DIR/zsh/aliases.zsh"
 }
 
-kra() {
-  mkdir -p kra
-  setopt local_options nullglob
-  local files=( *.jpg.kra )
-  (( ${#files} )) && mv -- "${files[@]}" kra
-  rm -f -- *~ kra/*~ 2>/dev/null
-}
+#kra() {
+#  mkdir -p kra
+#  setopt local_options nullglob
+#  local files=( *.jpg.kra )
+#  (( ${#files} )) && mv -- "${files[@]}" kra
+#  rm -f -- *~ kra/*~ 2>/dev/null
+#}
+
+# Ubuntu/Debian alatt batcat -> bat
+if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
+  alias bat='batcat'
+fi
+
+# Opcionális: cat kiváltása bat-tal (sima cat marad: \cat vagy /bin/cat)
+alias cat='bat --paging=never'
