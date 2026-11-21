@@ -2,6 +2,10 @@
 [[ -f "$HOME/.my_settings_env" ]] && source "$HOME/.my_settings_env"
 : "${MY_SETTINGS_DIR:=$HOME/my_settings}"
 
+if [[ -z "${LANG:-}" || "$LANG" == "C" || "$LANG" == "POSIX" ]]; then
+  export LANG="C.UTF-8"
+fi
+
 export PATH="$MY_SETTINGS_DIR/bin:$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 
 export ZSH="$HOME/.oh-my-zsh"
@@ -51,6 +55,8 @@ plugins=(
   zsh-syntax-highlighting
 
 )
+
+ZSH_DISABLE_COMPFIX="true"
 
 source "$ZSH/oh-my-zsh.sh"
 

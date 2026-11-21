@@ -7,7 +7,7 @@ ZSH_CUSTOM_DIR="$REPO_DIR/zsh"
 
 # Oh My Zsh telepítése (scriptet nem szakítja meg)
 if [[ ! -d "$ZSH_DIR" ]]; then
-  RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
 mkdir -p "$ZSH_CUSTOM_DIR/plugins" "$HOME/bin"
@@ -29,6 +29,8 @@ clone_plugin "https://github.com/zsh-users/zsh-completions" "zsh-completions"
 clone_plugin "https://github.com/hlissner/zsh-autopair" "zsh-autopair"
 
 # Alapértelmezett shell átállítása zsh-ra
-if [[ "$SHELL" != "$(command -v zsh)" ]]; then
-  chsh -s "$(command -v zsh)" || echo "Megjegyzés: chsh sikertelen, állítsd át manuálisan."
+TARGET_USER="$(id -un)"
+ZSH_PATH="$(command -v zsh)"
+if [[ -n "$ZSH_PATH" && "$SHELL" != "$ZSH_PATH" ]]; then
+  sudo chsh -s "$ZSH_PATH" "$TARGET_USER" || echo "Megjegyzés: chsh sikertelen, állítsd át manuálisan."
 fi

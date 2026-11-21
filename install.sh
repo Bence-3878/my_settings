@@ -34,7 +34,7 @@ bash "$REPO_DIR/link_configs.sh" "$PROFILE"
 # --- 2. CSOMAGLISTÁK ---
 # Mindkettőre megy (RPi szerver + laptop)
 BASE_PKGS=(
-  mc zsh git curl fzf tree htop btop tmux ranger
+  mc zsh git gh curl fzf tree htop btop tmux ranger
   micro unzip inxi speedtest-cli hexedit
   eza fastfetch tealdeer sl gcc clang
 )
