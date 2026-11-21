@@ -29,6 +29,8 @@ if [[ "$PROFILE" != "server" && "$PROFILE" != "desktop" ]]; then
 fi
 echo "==> Kiválasztott profil: $PROFILE"
 
+bash "$REPO_DIR/link_configs.sh" "$PROFILE"
+
 # --- 2. CSOMAGLISTÁK ---
 # Mindkettőre megy (RPi szerver + laptop)
 BASE_PKGS=(

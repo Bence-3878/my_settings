@@ -10,7 +10,11 @@ fi
 ln -sf "$REPO_DIR/zshrc" "$HOME/.zshrc"
 
 # Repo útvonal mentése, hogy a .zshrc ne függjön a fix ~/mis mappától
-echo "export MY_SETTINGS_DIR=\"$REPO_DIR\"" > "$HOME/.my_settings_env"
+PROFILE="${1:-desktop}"
+cat << EOF > "$HOME/.my_settings_env"
+export MY_SETTINGS_DIR="$REPO_DIR"
+export MY_SETTINGS_PROFILE="$PROFILE"
+EOF
 
 # Neofetch konfig (ha még használod)
 if [[ -f "$REPO_DIR/config/neofetch.conf" ]]; then

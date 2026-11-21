@@ -1,11 +1,26 @@
-alias kra="if [ ! -d \"kra\" ]; then mkdir kra; fi; if [ -d \"*.jpg.kra\" ]; then mv *.jpg.kra kra; fi; if [ -d \"*~\" ]; then rm *~; fi; if [ -d \"kra/*~\" ]; then rm kra/*~; fi;"
-alias clion="nohup ~/JetBrains/CLion/bin/clion.sh &"
-alias pycharm="nohup ~/JetBrains/pycharm/bin/pycharm.sh &"
-alias py="nohup ~/JetBrains/pycharm/bin/pycharm.sh &"
-alias datagrip="nohup ~/JetBrains/Datagrip/bin/datagrip.sh &"
-alias idea="nohup ~/JetBrains/IdeaIU/bin/idea.sh &"
-alias zshconfig="${EDITOR} ~/mis/zshrc"
-alias m=$EDITOR
-alias nano=$EDITOR
-alias nano2="/bin/nano"
-alias beep='mplayer /home/jabba/Dropbox/assets/done.mp3 1>/dev/null 2>&1'
+# Szerkesztők
+alias m='$EDITOR'
+alias nano='$EDITOR'
+alias nano2='/bin/nano'
+
+# Alkalmazások
+alias clion='nohup ~/JetBrains/CLion/bin/clion.sh >/dev/null 2>&1 &'
+alias pycharm='nohup ~/JetBrains/pycharm/bin/pycharm.sh >/dev/null 2>&1 &'
+alias beep="mplayer \"$MY_SETTINGS_DIR/valami/done.mp3\" >/dev/null 2>&1"
+
+# Függvények
+zshconfig() {
+  "$EDITOR" "$MY_SETTINGS_DIR/zshrc"
+}
+
+aliases() {
+  "$EDITOR" "$MY_SETTINGS_DIR/zsh/aliases.zsh"
+}
+
+kra() {
+  mkdir -p kra
+  setopt local_options nullglob
+  local files=( *.jpg.kra )
+  (( ${#files} )) && mv -- "${files[@]}" kra
+  rm -f -- *~ kra/*~ 2>/dev/null
+}
