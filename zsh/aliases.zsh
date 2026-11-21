@@ -32,3 +32,33 @@ fi
 
 # Opcionális: cat kiváltása bat-tal (sima cat marad: \cat vagy /bin/cat)
 alias cat='bat --paging=never'
+
+zhelp() {
+  local -A desc=(
+    git                          "Git aliasok (gst, gaa, gcmsg, gp, gl)"
+    sudo                         "Dupla ESC -> 'sudo' a sor elejére"
+    web-search                   "Keresés terminálból (google / github <szó>)"
+    virtualenv                   "Python venv állapot kezelés"
+    ssh-agent                    "Automatikus SSH kulcs betöltés"
+    copyfile                     "Fájl tartalma vágólapra: copyfile <fájl>"
+    copypath                     "Mappa/fájl útvonala vágólapra: copypath [fájl]"
+    extract                      "Bármi kicsomagolása: x <fájl>"
+    colored-man-pages            "Színes, olvashatóbb man oldalak"
+    dirhistory                   "Alt+Bal / Alt+Jobb: előző/következő mappa"
+    command-not-found            "Hiányzó parancsnál kiírja a szükséges csomagot"
+    systemd                      "systemctl aliasok (sc-status, sc-restart, sc-enable)"
+    fzf                          "Ctrl+R (előzmény), Ctrl+T (fájl), Alt+C (mappa)"
+    zsh-z                        "Gyors mappaugrás előzményből: z <részlet>"
+    you-should-use               "Szól, ha van rövidebb aliasod a parancsra"
+    zsh-autopair                 "Automatikus zárójel / idézőjel bezárás"
+    fzf-tab                      "Interaktív fzf menü Tab kiegészítésnél"
+    zsh-autosuggestions          "Előzmény-javaslat (Jobbra nyíl: elfogad)"
+    zsh-history-substring-search "Fel/Le nyíl: keresés a begépelt részletre"
+    zsh-syntax-highlighting      "Zöld = jó parancs, Piros = hibás parancs"
+  )
+
+  print -P "%B%F{cyan}Aktív Zsh pluginok:%f%b"
+  for p in "${plugins[@]}"; do
+    printf "  \e[32m%-29s\e[0m %s\n" "$p" "${desc[$p]:-(nincs leírás)}"
+  done
+}
