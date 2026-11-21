@@ -1,3 +1,0 @@
-PROMPT='%m'
-RPS1='%(?..%F{red}%? ↵%f)' # kiírja az előző sor hibakodját
-
