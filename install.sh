@@ -36,7 +36,7 @@ bash "$REPO_DIR/link_configs.sh" "$PROFILE"
 BASE_PKGS=(
   mc zsh git curl fzf tree htop btop tmux ranger
   micro unzip inxi speedtest-cli hexedit
-  eza fastfetch
+  eza fastfetch tealdeer sl gcc clang
 )
 
 # Csak szerverre (pl. RPi)
@@ -46,7 +46,7 @@ SERVER_PKGS=(
 
 # Csak asztali gépre (laptop)
 DESKTOP_PKGS=(
-  gcc clang gdb sl cowsay lolcat w3m
+  gdb cowsay lolcat w3m bat
   terminator wine git-cola gufw mplayer flatpak
 )
 
@@ -78,13 +78,13 @@ DISTRO_BASE=()
 DISTRO_DESKTOP=()
 case "$PM" in
   apt)
-    DISTRO_BASE=(openssh-server)
-    DISTRO_DESKTOP=(g++ w3m-img fonts-powerline default-jre)
+    DISTRO_BASE=(g++ openssh-server)
+    DISTRO_DESKTOP=(w3m-img fonts-powerline default-jre)
     sudo apt update && sudo apt upgrade -y
     ;;
   dnf)
-    DISTRO_BASE=(openssh-server)
-    DISTRO_DESKTOP=(gcc-c++ powerline-fonts java-latest-openjdk)
+    DISTRO_BASE=(gcc-c++ openssh-server)
+    DISTRO_DESKTOP=(powerline-fonts java-latest-openjdk)
     sudo dnf upgrade -y
     ;;
   pacman)
@@ -93,8 +93,8 @@ case "$PM" in
     sudo pacman -Syu --noconfirm
     ;;
   zypper)
-    DISTRO_BASE=(openssh)
-    DISTRO_DESKTOP=(gcc-c++ powerline-fonts java-21-openjdk)
+    DISTRO_BASE=(gcc-c++ openssh)
+    DISTRO_DESKTOP=(powerline-fonts java-21-openjdk)
     sudo zypper refresh && sudo zypper update -y
     ;;
 esac
@@ -109,6 +109,60 @@ install_pkg() {
     dnf)    sudo dnf install -y "$pkg" || FAILED_PKGS+=("$pkg") ;;
     pacman) sudo pacman -S --noconfirm --needed "$pkg" || FAILED_PKGS+=("$pkg") ;;
     zypper) sudo zypper install -y "$pkg" || FAILED_PKGS+=("$pkg") ;;
+  esac
+}
+
+install_espanso() {
+  command -v espanso &>/dev/null && return
+  echo "==> Espanso telepítése..."
+
+  local session="${XDG_SESSION_TYPE:-x11}"
+  local tmp_deb="/tmp/espanso.deb"
+
+  if [[ "$PM" == "apt" ]]; then
+    if [[ "$session" == "wayland" ]]; then
+      curl -fSL "https://github.com/espanso/espanso/releases/latest/download/espanso-debian-wayland-amd64.deb" -o "$tmp_deb"
+    else
+      curl -fSL "https://github.com/espanso/espanso/releases/latest/download/espanso-debian-x11-amd64.deb" -o "$tmp_deb"
+    fi
+    sudo apt install -y "$tmp_deb"
+    rm -f "$tmp_deb"
+  elif [[ "$PM" == "pacman" ]] && command -v yay &>/dev/null; then
+    yay -S --noconfirm "espanso-${session}"
+  elif [[ "$session" == "x11" ]]; then
+    # Disztrófüggetlen X11 fallback (AppImage)
+    mkdir -p "$HOME/bin"
+    curl -fSL "https://github.com/espanso/espanso/releases/latest/download/Espanso-X11.AppImage" -o "$HOME/bin/espanso"
+    chmod +x "$HOME/bin/espanso"
+  else
+    echo "Figyelem: Espanso Wayland alatt ezen a disztrón manuális telepítést igényel." >&2
+    return
+  fi
+
+  espanso service register
+  espanso start
+}
+
+install_uex() {
+  command -v uex &>/dev/null && return
+  echo "==> UltraEdit (uex) telepítése..."
+
+  case "$PM" in
+    apt)
+      local tmp="/tmp/uex.deb"
+      curl -fSL "https://downloads.ultraedit.com/main/ue/linux/uex_amd64.deb" -o "$tmp"
+      sudo apt install -y "$tmp"
+      rm -f "$tmp"
+      ;;
+    dnf)
+      local tmp="/tmp/uex.rpm"
+      curl -fSL "https://downloads.ultraedit.com/main/ue/linux/uex_x86_64.rpm" -o "$tmp"
+      sudo dnf install -y "$tmp"
+      rm -f "$tmp"
+      ;;
+    pacman)
+      command -v yay &>/dev/null && yay -S --noconfirm uex
+      ;;
   esac
 }
 
@@ -138,11 +192,17 @@ else
     flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
     flatpak install -y flathub "${FLATPAK_APPS[@]}"
   fi
+
+  install_espanso
+  install_uex
 fi
 
 # --- 5. ZSH ÉS KONFIGOK ---
 bash "$REPO_DIR/setup_zsh.sh"
 bash "$REPO_DIR/link_configs.sh"
+bash "$REPO_DIR/build_bin.sh"
+
+command -v tldr &>/dev/null && tldr --update || true
 
 echo "========================================"
 echo "Kész ($PROFILE profil)!"
