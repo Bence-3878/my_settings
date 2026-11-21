@@ -82,7 +82,7 @@ prompt_virtualenv() {
   fi
 
   if [[ -n "$env_name" ]]; then
-    prompt_segment "$MY_VENV_BG" "$MY_VENV_FG" "🐍 ${env_name:gs/%/%%}"
+    prompt_segment "$MY_VENV_BG" "$MY_VENV_FG" "py:${env_name:gs/%/%%}"
   fi
 }
 
@@ -148,8 +148,27 @@ build_prompt() {
 build_rprompt() {
   local exit_code="$1"
   R_CURRENT_BG='NONE'
+
   (( exit_code != 0 )) && rprompt_segment red white "✘ $exit_code"
-  (( _MY_CMD_ELAPSED >= 2 )) && rprompt_segment yellow black "⏱ ${_MY_CMD_ELAPSED}s"
+
+  if (( _MY_CMD_ELAPSED >= 2 )); then
+    local s=$_MY_CMD_ELAPSED
+    local h=$(( s / 3600 ))
+    local m=$(( (s % 3600) / 60 ))
+    local sec=$(( s % 60 ))
+    local elapsed=""
+
+    if (( h > 0 )); then
+      elapsed="${h}h ${m}m ${sec}s"
+    elif (( m > 0 )); then
+      elapsed="${m}m ${sec}s"
+    else
+      elapsed="${sec}s"
+    fi
+
+    rprompt_segment yellow black "⏱ $elapsed"
+  fi
+
   rprompt_segment black white "%T"
   rprompt_end
 }
