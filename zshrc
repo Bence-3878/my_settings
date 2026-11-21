@@ -31,14 +31,25 @@ zstyle ':omz:plugins:ssh-agent' quiet yes
 plugins=(
   git
   sudo
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-  zsh-history-substring-search
   web-search
   virtualenv
   ssh-agent
   copyfile
+  copypath
+  fzf
+  extract
+  colored-man-pages
+  dirhistory
+  command-not-found
+  systemd
   zsh-z
+  you-should-use
+  zsh-autopair
+  fzf-tab
+  zsh-autosuggestions
+  zsh-history-substring-search
+  zsh-syntax-highlighting
+
 )
 
 source "$ZSH/oh-my-zsh.sh"

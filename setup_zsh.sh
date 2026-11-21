@@ -23,6 +23,10 @@ clone_plugin "https://github.com/zsh-users/zsh-autosuggestions" "zsh-autosuggest
 clone_plugin "https://github.com/zsh-users/zsh-syntax-highlighting" "zsh-syntax-highlighting"
 clone_plugin "https://github.com/zsh-users/zsh-history-substring-search" "zsh-history-substring-search"
 clone_plugin "https://github.com/agkozak/zsh-z" "zsh-z"
+clone_plugin "https://github.com/MichaelAquilina/zsh-you-should-use" "you-should-use"
+clone_plugin "https://github.com/Aloxaf/fzf-tab" "fzf-tab"
+clone_plugin "https://github.com/zsh-users/zsh-completions" "zsh-completions"
+clone_plugin "https://github.com/hlissner/zsh-autopair" "zsh-autopair"
 
 # Alapértelmezett shell átállítása zsh-ra
 if [[ "$SHELL" != "$(command -v zsh)" ]]; then
