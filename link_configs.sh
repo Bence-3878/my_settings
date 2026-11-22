@@ -19,4 +19,9 @@ EOF
 mkdir -p "$HOME/.config/fastfetch"
 ln -sf "$REPO_DIR/config/fastfetch.jsonc" "$HOME/.config/fastfetch/config.jsonc"
 
+mkdir -p "$HOME/.config/neofetch"
+ln -sf "$REPO_DIR/config/neofetch.conf" "$HOME/.config/neofetch/config.conf"
+
+ln -sf "$REPO_DIR/config/tmux.conf" "$HOME/.tmux.conf"
+
 echo "==> Symlinkek létrehozva."
