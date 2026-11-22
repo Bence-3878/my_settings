@@ -16,10 +16,7 @@ export MY_SETTINGS_DIR="$REPO_DIR"
 export MY_SETTINGS_PROFILE="$PROFILE"
 EOF
 
-# Neofetch konfig (ha még használod)
-if [[ -f "$REPO_DIR/config/neofetch.conf" ]]; then
-  mkdir -p "$HOME/.config/neofetch"
-  ln -sf "$REPO_DIR/config/neofetch.conf" "$HOME/.config/neofetch/config.conf"
-fi
+mkdir -p "$HOME/.config/fastfetch"
+ln -sf "$REPO_DIR/config/fastfetch.jsonc" "$HOME/.config/fastfetch/config.jsonc"
 
 echo "==> Symlinkek létrehozva."
