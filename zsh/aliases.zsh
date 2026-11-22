@@ -67,7 +67,7 @@ zhelp() {
 if command -v eza &>/dev/null; then
   alias ls='eza --icons=auto --group-directories-first'
   alias ll='eza -la --icons=auto --group-directories-first --git'
-  alias lt='eza --tree --level=2 --icons=auto'
+  alias lt='eza --tree --level=3 --icons=auto'
 fi
 
 # fd (Debian/Ubuntu alatt fdfind néven fut)

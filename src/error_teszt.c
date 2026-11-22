@@ -1,10 +1,6 @@
-#include <stdio.h>
-
 int main(int argc, char ** argv) {
-    if (argc < 2) {
-        printf("Nincs argumentum\n");
-        return 1;
-    }
+    if (argc < 2) 
+        return 2;
     int a = 0;
     for (int i = 0; argv[1][i] >= '0' && argv[1][i] <= '9' ; i++) {
     a *= 10;
