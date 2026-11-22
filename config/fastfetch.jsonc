@@ -1,13 +1,27 @@
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
+    "type": "small",
     "padding": {
       "top": 1,
-      "right": 3
+      "right": 2
     }
   },
   "display": {
-    "separator": " │ "
+    "separator": " │ ",
+    "size": {
+      "ndigits": 2
+    },
+    "bar": {
+      "width": 6,
+      "char": {
+        "elapsed": "■",
+        "total": "─"
+      }
+    },
+    "percent": {
+      "type": 11
+    }
   },
   "modules": [
     {
@@ -16,27 +30,34 @@
     },
     {
       "type": "os",
-      "key": "│  OS      ",
-      "keyColor": "cyan"
+      "key": "│  OS  ",
+      "keyColor": "cyan",
+      "format": "{pretty-name}"
     },
     {
       "type": "host",
-      "key": "│ 󰌢 Host    ",
+      "key": "│ 󰌢 Host",
       "keyColor": "cyan"
     },
     {
       "type": "kernel",
-      "key": "│  Kernel  ",
-      "keyColor": "cyan"
+      "key": "│  Kern",
+      "keyColor": "cyan",
+      "format": "{release}"
     },
     {
       "type": "uptime",
-      "key": "│ 󰅐 Uptime  ",
+      "key": "│ 󰅐 Up  ",
+      "keyColor": "cyan"
+    },
+    {
+      "type": "loadavg",
+      "key": "│ 󰊚 Load",
       "keyColor": "cyan"
     },
     {
       "type": "packages",
-      "key": "│ 󰏖 Csomagok",
+      "key": "│ 󰏖 Pkg",
       "keyColor": "cyan"
     },
     {
@@ -45,23 +66,29 @@
     },
     {
       "type": "shell",
-      "key": "│  Shell   ",
+      "key": "│  Sh  ",
       "keyColor": "blue"
     },
     {
       "type": "de",
-      "key": "│ 󰧨 DE      ",
+      "key": "│ 󰧨 DE  ",
       "keyColor": "blue"
     },
     {
       "type": "wm",
-      "key": "│  WM      ",
+      "key": "│  WM  ",
       "keyColor": "blue"
     },
     {
       "type": "terminal",
-      "key": "│  Terminál",
+      "key": "│  Term",
       "keyColor": "blue"
+    },
+    {
+      "type": "display",
+      "key": "│ 󰍹 Disp",
+      "keyColor": "blue",
+      "format": "{width}x{height}@{refresh-rate}Hz"
     },
     {
       "type": "custom",
@@ -69,39 +96,70 @@
     },
     {
       "type": "cpu",
-      "key": "│  CPU     ",
-      "keyColor": "magenta"
+      "temp": true,
+      "key": "│  CPU ",
+      "keyColor": "magenta",
+      "format": "{name} {temperature}"
     },
     {
       "type": "gpu",
-      "key": "│ 󰢮 GPU     ",
-      "keyColor": "magenta"
+      "temp": true,
+      "key": "│ 󰢮 GPU ",
+      "keyColor": "magenta",
+      "format": "{name~0,25} {temperature}"
     },
     {
       "type": "memory",
-      "key": "│ 󰍛 RAM     ",
+      "key": "│ 󰍛 RAM ",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "swap",
+      "key": "│ 󰾴 Swap",
       "keyColor": "magenta"
     },
     {
       "type": "disk",
       "folders": "/",
-      "key": "│ 󰋊 Lemez   ",
+      "key": "│ 󰋊 Disk",
       "keyColor": "magenta"
     },
     {
-      "type": "localip",
-      "compact": true,
-      "key": "│ 󰩟 Helyi IP",
+      "type": "battery",
+      "key": "│ 󰁹 Bat ",
       "keyColor": "magenta"
     },
     {
       "type": "custom",
-      "format": "\u001b[35m╰──────────────────────────────\u001b[0m"
+      "format": "\u001b[32m├─ Hálózat\u001b[0m"
+    },
+    {
+      "type": "wifi",
+      "key": "│ 󰖩 WiFi",
+      "keyColor": "green",
+      "format": "{ssid}"
+    },
+    {
+      "type": "localip",
+      "compact": true,
+      "key": "│ 󰩟 LAN ",
+      "keyColor": "green"
+    },
+    {
+      "type": "publicip",
+      "timeout": 500,
+      "key": "│ 󰖟 WAN ",
+      "keyColor": "green"
+    },
+    {
+      "type": "custom",
+      "format": "\u001b[32m╰───────────────────────\u001b[0m"
     },
     {
       "type": "colors",
       "paddingLeft": 2,
       "symbol": "circle"
-    }
+    },
+    "break"
   ]
 }

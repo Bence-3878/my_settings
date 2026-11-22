@@ -75,6 +75,13 @@ if command -v fdfind &>/dev/null && ! command -v fd &>/dev/null; then
   alias fd='fdfind'
 fi
 
+if command -v fastfetch &>/dev/null; then
+  alias ff='fastfetch'
+elif command -v neofetch &>/dev/null; then
+  alias ff='neofetch'
+fi
+
 # Egyéb gyorsparancsok
 command -v lazygit &>/dev/null && alias lg='lazygit'
 command -v trash-put &>/dev/null && alias del='trash-put'
+
