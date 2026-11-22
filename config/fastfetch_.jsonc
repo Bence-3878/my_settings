@@ -1,0 +1,165 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "type": "small",
+    "padding": {
+      "top": 1,
+      "right": 2
+    }
+  },
+  "display": {
+    "separator": " │ ",
+    "size": {
+      "ndigits": 2
+    },
+    "bar": {
+      "width": 6,
+      "char": {
+        "elapsed": "■",
+        "total": "─"
+      }
+    },
+    "percent": {
+      "type": 11
+    }
+  },
+  "modules": [
+    {
+      "type": "custom",
+      "format": "\u001b[36m╭─ Rendszer\u001b[0m"
+    },
+    {
+      "type": "os",
+      "key": "│  OS  ",
+      "keyColor": "cyan",
+      "format": "{pretty-name}"
+    },
+    {
+      "type": "host",
+      "key": "│ 󰌢 Host",
+      "keyColor": "cyan"
+    },
+    {
+      "type": "kernel",
+      "key": "│  Kern",
+      "keyColor": "cyan",
+      "format": "{release}"
+    },
+    {
+      "type": "uptime",
+      "key": "│ 󰅐 Up  ",
+      "keyColor": "cyan"
+    },
+    {
+      "type": "loadavg",
+      "key": "│ 󰊚 Load",
+      "keyColor": "cyan"
+    },
+    {
+      "type": "packages",
+      "key": "│ 󰏖 Pkg",
+      "keyColor": "cyan"
+    },
+    {
+      "type": "custom",
+      "format": "\u001b[34m├─ Környezet\u001b[0m"
+    },
+    {
+      "type": "shell",
+      "key": "│  Sh  ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "de",
+      "key": "│ 󰧨 DE  ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "wm",
+      "key": "│  WM  ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "terminal",
+      "key": "│  Term",
+      "keyColor": "blue"
+    },
+    {
+      "type": "display",
+      "key": "│ 󰍹 Disp",
+      "keyColor": "blue",
+      "format": "{width}x{height}@{refresh-rate}Hz"
+    },
+    {
+      "type": "custom",
+      "format": "\u001b[35m├─ Hardver\u001b[0m"
+    },
+    {
+      "type": "cpu",
+      "temp": true,
+      "key": "│  CPU ",
+      "keyColor": "magenta",
+      "format": "{name} {temperature}"
+    },
+    {
+      "type": "gpu",
+      "temp": true,
+      "key": "│ 󰢮 GPU ",
+      "keyColor": "magenta",
+      "format": "{name~0,25} {temperature}"
+    },
+    {
+      "type": "memory",
+      "key": "│ 󰍛 RAM ",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "swap",
+      "key": "│ 󰾴 Swap",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "disk",
+      "folders": "/",
+      "key": "│ 󰋊 Disk",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "battery",
+      "key": "│ 󰁹 Bat ",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "custom",
+      "format": "\u001b[32m├─ Hálózat\u001b[0m"
+    },
+    {
+      "type": "wifi",
+      "key": "│ 󰖩 WiFi",
+      "keyColor": "green",
+      "format": "{ssid}"
+    },
+    {
+      "type": "localip",
+      "compact": true,
+      "key": "│ 󰩟 LAN ",
+      "keyColor": "green"
+    },
+    {
+      "type": "publicip",
+      "timeout": 500,
+      "key": "│ 󰖟 WAN ",
+      "keyColor": "green"
+    },
+    {
+      "type": "custom",
+      "format": "\u001b[32m╰───────────────────────\u001b[0m"
+    },
+    {
+      "type": "colors",
+      "paddingLeft": 2,
+      "symbol": "circle"
+    },
+    "break"
+  ]
+}
