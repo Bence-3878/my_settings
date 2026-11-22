@@ -238,9 +238,9 @@ else
 fi
 
 # --- 5. ZSH ÉS KONFIGOK ---
-bash "$REPO_DIR/setup_zsh.sh"
-bash "$REPO_DIR/link_configs.sh"
-bash "$REPO_DIR/build_bin.sh"
+bash "$REPO_DIR/scripts/setup_zsh.sh"
+bash "$REPO_DIR/scripts/link_configs.sh"
+bash "$REPO_DIR/scripts/build_bin.sh"
 
 command -v tldr &>/dev/null && tldr --update || true
 

@@ -2,6 +2,10 @@
 [[ -f "$HOME/.my_settings_env" ]] && source "$HOME/.my_settings_env"
 : "${MY_SETTINGS_DIR:=$HOME/my_settings}"
 
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 if [[ -z "${LANG:-}" || "$LANG" == "C" || "$LANG" == "POSIX" ]]; then
   export LANG="C.UTF-8"
 fi
@@ -66,3 +70,5 @@ if [[ "$MY_SETTINGS_PROFILE" == "server" ]] \
    && command -v tmux &>/dev/null; then
   exec tmux new-session -A -s main
 fi
+
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
