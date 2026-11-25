@@ -1,0 +1,3 @@
+# Másold át 'zsh/aliases.local.zsh' névre ezen a gépen (Git figyelmen kívül hagyja)
+alias rpi='ssh felhasznalo@192.168.1.50'
+alias vps='ssh felhasznalo@pelda-domain.hu -p 2222'

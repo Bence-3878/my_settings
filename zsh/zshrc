@@ -86,3 +86,6 @@ if [[ "$TERM" == "linux" ]]; then
   done
   unset _s _dir _res _w_cm _h_cm
 fi
+
+[[ -f "$MY_SETTINGS_DIR/zsh/aliases.local.zsh" ]] && source "$MY_SETTINGS_DIR/zsh/aliases.local.zsh"
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

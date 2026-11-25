@@ -1,2 +1,4 @@
 /bin/error_t
 /windows/
+*.local
+*.local.zsh
