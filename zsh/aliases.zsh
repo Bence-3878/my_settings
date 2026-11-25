@@ -85,3 +85,13 @@ fi
 command -v lazygit &>/dev/null && alias lg='lazygit'
 command -v trash-put &>/dev/null && alias del='trash-put'
 
+alias -s py='python3'
+alias -s lua='lua'
+alias -s js='node'
+alias -s bf='beef'
+
+alias -s {md,txt,json,conf}='micro'
+alias sudo='sudo '
+mkcd() {
+    mkdir -p  && cd  || return 1
+}

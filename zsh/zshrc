@@ -72,3 +72,17 @@ if [[ "$MY_SETTINGS_PROFILE" == "server" ]] \
 fi
 
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+if [[ "$TERM" == "linux" ]]; then
+  for _s in /sys/class/drm/card*-*/status(N); do
+    [[ "$(<"$_s")" == "connected" ]] || continue
+    _dir="${_s%/status}"
+    _res=$(head -n1 "$_dir/modes" 2>/dev/null)
+    read _w_cm _h_cm <<< $(od -An -tu1 -j 21 -N 2 "$_dir/edid" 2>/dev/null)
+    if (( ${_w_cm:-0} > 0 && (${_res%x*} * 254 / (_w_cm * 100)) > 130 )); then
+      setfont Lat15-Terminus32x16 2>/dev/null
+      break
+    fi
+  done
+  unset _s _dir _res _w_cm _h_cm
+fi
