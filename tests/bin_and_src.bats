@@ -49,6 +49,11 @@ setup() {
     run "$tmp_repo/scripts/build_bin.sh"
     [ "$status" -eq 0 ]
     [[ "$output" == *"Fordítás: error_teszt"* ]]
+
+    # --force esetén változás nélkül is újrafordít
+    run "$tmp_repo/scripts/build_bin.sh" --force
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Fordítás: error_teszt"* ]]
 }
 
 @test "build_bin.sh figyelmeztetéssel, 0-val lép ki, ha nincs C fordító" {

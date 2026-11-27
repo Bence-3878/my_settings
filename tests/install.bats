@@ -53,7 +53,21 @@ create_temp_repo() {
     [[ "$output" == *"FreeBSD telepítő még nincs implementálva"* ]]
 }
 
-@test "install.sh hibával áll le, ha a cél szkript nem futtatható" {
+@test "install.sh hibával áll le, ha a cél szkript hiányzik" {
+    local tmp_repo
+    tmp_repo="$(create_temp_repo)"
+    rm -f "$tmp_repo/os/freebsd.sh"
+
+    printf '#!/bin/sh\necho "FreeBSD"\n' > "$BATS_TEST_TMPDIR/bin/uname"
+    chmod +x "$BATS_TEST_TMPDIR/bin/uname"
+
+    run "$tmp_repo/install.sh"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Hiányzó szkript"* ]]
+}
+
+@test "install.sh akkor is futtatja a cél szkriptet, ha nincs +x jogosultsága" {
     local tmp_repo
     tmp_repo="$(create_temp_repo)"
     chmod -x "$tmp_repo/os/freebsd.sh"
@@ -63,8 +77,8 @@ create_temp_repo() {
 
     run "$tmp_repo/install.sh"
 
-    [ "$status" -eq 1 ]
-    [[ "$output" == *"Hiányzó vagy nem futtatható szkript"* ]]
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"FreeBSD telepítő még nincs implementálva"* ]]
 }
 
 @test "install.sh Linux esetén továbbadja az argumentumokat az os/linux.sh-nak" {
@@ -76,10 +90,33 @@ create_temp_repo() {
     printf '#!/bin/sh\necho "Linux"\n' > "$BATS_TEST_TMPDIR/bin/uname"
     chmod +x "$BATS_TEST_TMPDIR/bin/uname"
 
+    unset WSL_DISTRO_NAME WSL_INTEROP
     run "$tmp_repo/install.sh" --server
 
     [ "$status" -eq 0 ]
     [ "$output" = "ARGS:--server" ]
+}
+
+@test "install.sh WSL környezetben az os/wsl.sh szkriptet futtatja" {
+    local tmp_repo
+    tmp_repo="$(create_temp_repo)"
+    printf '#!/usr/bin/env bash\necho "WSL_ARGS:$*"\n' > "$tmp_repo/os/wsl.sh"
+    chmod +x "$tmp_repo/os/wsl.sh"
+
+    printf '#!/bin/sh\necho "Linux"\n' > "$BATS_TEST_TMPDIR/bin/uname"
+    chmod +x "$BATS_TEST_TMPDIR/bin/uname"
+
+    WSL_DISTRO_NAME="Ubuntu" run "$tmp_repo/install.sh" --wsl
+
+    [ "$status" -eq 0 ]
+    [ "$output" = "WSL_ARGS:--wsl" ]
+}
+
+@test "os/wsl.sh hibával áll le érvénytelen kapcsoló esetén" {
+    run "$REPO_ROOT/os/wsl.sh" --invalid
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Használat:"* ]]
 }
 
 @test "os/linux.sh hibával áll le érvénytelen profil kapcsoló esetén" {

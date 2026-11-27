@@ -154,10 +154,21 @@ EOF
 
     printf '#!/usr/bin/env bash\necho "curl" >> "%s"\n' "$log_file" > "$BATS_TEST_TMPDIR/bin/curl"
     printf '#!/usr/bin/env bash\necho "git" >> "%s"\n' "$log_file" > "$BATS_TEST_TMPDIR/bin/git"
+    printf '#!/usr/bin/env bash\necho "sudo" >> "%s"\n' "$log_file" > "$BATS_TEST_TMPDIR/bin/sudo"
+    printf '#!/usr/bin/env bash\necho "chsh" >> "%s"\n' "$log_file" > "$BATS_TEST_TMPDIR/bin/chsh"
     printf '#!/usr/bin/env bash\nexit 0\n' > "$BATS_TEST_TMPDIR/bin/zsh"
     chmod +x "$BATS_TEST_TMPDIR/bin/"*
 
-    SHELL="$BATS_TEST_TMPDIR/bin/zsh" run "$TMP_REPO/scripts/setup_zsh.sh"
+    local expected_zsh
+    if [[ -x /usr/bin/zsh ]]; then
+        expected_zsh="/usr/bin/zsh"
+    elif [[ -x /bin/zsh ]]; then
+        expected_zsh="/bin/zsh"
+    else
+        expected_zsh="$BATS_TEST_TMPDIR/bin/zsh"
+    fi
+
+    SHELL="$expected_zsh" run "$TMP_REPO/scripts/setup_zsh.sh"
 
     [ "$status" -eq 0 ]
     [ ! -e "$log_file" ]
@@ -251,4 +262,104 @@ EOF
     grep -q 'Port 2222' "$HOME/.ssh/config.d/99-local.conf"
     grep -q 'IdentityFile ~/.ssh/id_ed25519' "$HOME/.ssh/config.d/99-local.conf"
     [[ "$output" == *"már létezik"* ]]
+}
+
+# --- update.sh ---
+
+@test "update.sh --help kiírja a használatot és 0-val kilép, ismeretlen kapcsolónál 1-gyel" {
+    run "$TMP_REPO/scripts/update.sh" --help
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Használat:"* ]]
+
+    run "$TMP_REPO/scripts/update.sh" --bad-flag
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Ismeretlen kapcsoló"* ]]
+}
+
+@test "update.sh frissíti a repót, rendszercsomagokat, OMZ-t, pluginokat, micro-t, symlinkeket és binárisokat" {
+    local log_file="$BATS_TEST_TMPDIR/update.log"
+    mkdir -p "$TMP_REPO/.git" "$TMP_REPO/src" \
+        "$HOME/.oh-my-zsh/.git" \
+        "$HOME/.oh-my-zsh/custom/themes/powerlevel10k/.git"
+    cp "$REPO_ROOT/src/error_teszt.c" "$TMP_REPO/src/"
+    for p in zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search zsh-z you-should-use fzf-tab zsh-completions zsh-autopair; do
+        mkdir -p "$HOME/.oh-my-zsh/custom/plugins/$p/.git"
+    done
+    printf 'export MY_SETTINGS_DIR="%s"\nexport MY_SETTINGS_PROFILE="server"\n' "$TMP_REPO" > "$HOME/.my_settings_env"
+
+    cat << EOF > "$BATS_TEST_TMPDIR/bin/sudo"
+#!/usr/bin/env bash
+exec env "\$@"
+EOF
+    cat << EOF > "$BATS_TEST_TMPDIR/bin/apt"
+#!/usr/bin/env bash
+echo "apt \$*" >> "$log_file"
+exit 0
+EOF
+    cat << EOF > "$BATS_TEST_TMPDIR/bin/flatpak"
+#!/usr/bin/env bash
+echo "flatpak \$*" >> "$log_file"
+exit 0
+EOF
+    cat << EOF > "$BATS_TEST_TMPDIR/bin/git"
+#!/usr/bin/env bash
+echo "git \$*" >> "$log_file"
+if [[ "\$*" == *"rev-parse"* ]]; then
+  echo "origin/master"
+fi
+exit 0
+EOF
+    cat << EOF > "$BATS_TEST_TMPDIR/bin/micro"
+#!/usr/bin/env bash
+echo "micro \$*" >> "$log_file"
+exit 0
+EOF
+    cat << EOF > "$BATS_TEST_TMPDIR/bin/tldr"
+#!/usr/bin/env bash
+echo "tldr \$*" >> "$log_file"
+exit 0
+EOF
+    printf '#!/bin/sh\nexit 0\n' > "$BATS_TEST_TMPDIR/bin/zsh"
+    printf '#!/bin/sh\nexit 0\n' > "$BATS_TEST_TMPDIR/bin/chsh"
+    chmod +x "$BATS_TEST_TMPDIR/bin/"*
+
+    SHELL="/usr/bin/zsh" run "$TMP_REPO/scripts/update.sh"
+
+    [ "$status" -eq 0 ]
+    grep -q "git -C $TMP_REPO pull --ff-only" "$log_file"
+    grep -q "apt update" "$log_file"
+    grep -q "apt upgrade -y" "$log_file"
+    grep -q "flatpak update -y" "$log_file"
+    grep -q "git -C $HOME/.oh-my-zsh pull --ff-only" "$log_file"
+    grep -q "git -C $HOME/.oh-my-zsh/custom/plugins/fzf-tab pull --ff-only" "$log_file"
+    grep -q "git -C $HOME/.oh-my-zsh/custom/themes/powerlevel10k pull --ff-only" "$log_file"
+    grep -q "micro -plugin update" "$log_file"
+    grep -q "tldr --update" "$log_file"
+    [ -L "$HOME/.zshrc" ]
+    [ -L "$HOME/.local/bin/my-settings-update" ]
+    [ -x "$HOME/bin/error_teszt" ]
+    [[ "$output" == *"Minden frissítve (server profil)."* ]]
+}
+
+@test "update.sh --no-system kihagyja a rendszercsomagok frissítését" {
+    local log_file="$BATS_TEST_TMPDIR/update_nosys.log"
+    mkdir -p "$HOME/.oh-my-zsh/custom/themes/powerlevel10k"
+    for p in zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search zsh-z you-should-use fzf-tab zsh-completions zsh-autopair; do
+        mkdir -p "$HOME/.oh-my-zsh/custom/plugins/$p"
+    done
+
+    printf '#!/usr/bin/env bash\necho "apt %s" >> "%s"\n' '$*' "$log_file" > "$BATS_TEST_TMPDIR/bin/apt"
+    printf '#!/usr/bin/env bash\necho "flatpak %s" >> "%s"\n' '$*' "$log_file" > "$BATS_TEST_TMPDIR/bin/flatpak"
+    printf '#!/bin/sh\nexit 0\n' > "$BATS_TEST_TMPDIR/bin/zsh"
+    printf '#!/bin/sh\nexit 0\n' > "$BATS_TEST_TMPDIR/bin/sudo"
+    printf '#!/bin/sh\nexit 0\n' > "$BATS_TEST_TMPDIR/bin/chsh"
+    printf '#!/bin/sh\nexit 0\n' > "$BATS_TEST_TMPDIR/bin/micro"
+    printf '#!/bin/sh\nexit 0\n' > "$BATS_TEST_TMPDIR/bin/tldr"
+    chmod +x "$BATS_TEST_TMPDIR/bin/"*
+
+    SHELL="/usr/bin/zsh" run "$TMP_REPO/scripts/update.sh" --no-system
+
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"kihagyva (--no-system)"* ]]
+    [ ! -e "$log_file" ]
 }
