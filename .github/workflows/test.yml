@@ -1,0 +1,24 @@
+name: Shell Tesztek
+
+on:
+  push:
+    branches: [ dev ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repó letöltése
+        uses: actions/checkout@v4
+
+      - name: ShellCheck és Bats telepítése
+        run: sudo apt-get update && sudo apt-get install -y shellcheck bats
+
+      - name: Szintaxis és hibaellenőrzés (ShellCheck)
+        run: find . -name "*.sh" -exec shellcheck {} +
+
+      - name: Rendszer-tesztek (Docker)
+        run: chmod +x tests/docker_test.sh && ./tests/docker_test.sh
+
+      - name: Unit tesztek futtatása (Bats)
+        run: bats tests/
