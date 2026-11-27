@@ -26,13 +26,21 @@ fi
 # Sudo előkészítése (ha nem rootként fut)
 SUDO=""
 if [[ "$(id -u)" -ne 0 ]]; then
-  SUDO="sudo"
+  if ! command -v sudo &>/dev/null; then
+    echo "Hiba: nincs 'sudo' telepítve, és a script nem rootként fut." >&2
+    exit 1
+  fi
+  if [[ -n "${SUDO_ASKPASS:-}" ]]; then
+    SUDO="sudo -A"
+  else
+    SUDO="sudo"
+  fi
   $SUDO -v || { echo "Hiba: sudo jogosultság szükséges a csomagok telepítéséhez." >&2; exit 1; }
 fi
 
 # --- 2. CSOMAGLISTÁK (WSL-re optimalizálva) ---
 BASE_PKGS=(
-  mc zsh git gh curl fzf tree htop btop tmux ranger
+  ca-certificates tar mc zsh git curl fzf tree htop btop tmux ranger
   micro unzip inxi hexedit
   eza fastfetch tealdeer sl gcc clang
   ripgrep ncdu duf jq trash-cli
@@ -55,25 +63,28 @@ PM="$(detect_pm)"
 DISTRO_BASE=()
 case "$PM" in
   apt)
-    DISTRO_BASE=(g++ fd-find mtr-tiny xz-utils fontconfig wslu)
+    DISTRO_BASE=(gh openssh-client g++ fd-find mtr-tiny xz-utils fontconfig wslu)
     $SUDO env DEBIAN_FRONTEND=noninteractive apt-get update && \
       $SUDO env DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
     ;;
   dnf)
-    DISTRO_BASE=(gcc-c++ fd-find mtr xz fontconfig)
+    DISTRO_BASE=(gh openssh-clients gcc-c++ fd-find mtr xz fontconfig util-linux-user)
     $SUDO dnf upgrade -y
     ;;
   pacman)
-    DISTRO_BASE=(fd mtr lazygit xz fontconfig)
+    DISTRO_BASE=(github-cli openssh fd mtr lazygit xz fontconfig)
+    if [[ ! -s /etc/pacman.d/gnupg/pubring.gpg ]]; then
+      $SUDO pacman-key --init && $SUDO pacman-key --populate archlinux
+    fi
     $SUDO pacman -Syu --noconfirm
     ;;
   zypper)
-    DISTRO_BASE=(gcc-c++ fd mtr lazygit xz fontconfig)
+    DISTRO_BASE=(gh openssh gcc-c++ fd mtr lazygit xz fontconfig)
     $SUDO zypper refresh && $SUDO zypper update -y
     ;;
 esac
 
-# --- 4. TELEPÍTÉS ---
+# --- 4. TELEPÍTÉS (gyors csoportos telepítés, hiba esetén egyenkénti fallback) ---
 FAILED_PKGS=()
 install_pkg() {
   local pkg="$1"
@@ -84,6 +95,22 @@ install_pkg() {
     pacman) $SUDO pacman -S --noconfirm --needed "$pkg" || FAILED_PKGS+=("$pkg") ;;
     zypper) $SUDO zypper install -y "$pkg" || FAILED_PKGS+=("$pkg") ;;
   esac
+}
+
+install_all_pkgs() {
+  local pkgs=("$@")
+  echo "==> Csomagok telepítése ($PM)..."
+  case "$PM" in
+    apt)    $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y "${pkgs[@]}" && return 0 ;;
+    dnf)    $SUDO dnf install -y "${pkgs[@]}" && return 0 ;;
+    pacman) $SUDO pacman -S --noconfirm --needed "${pkgs[@]}" && return 0 ;;
+    zypper) $SUDO zypper install -y "${pkgs[@]}" && return 0 ;;
+  esac
+
+  echo "Figyelem: csoportos telepítésnél hiányzó csomag volt, egyenkénti telepítés következik..."
+  for pkg in "${pkgs[@]}"; do
+    install_pkg "$pkg"
+  done
 }
 
 install_lazygit() {
@@ -107,10 +134,7 @@ install_lazygit() {
   fi
 }
 
-for pkg in "${BASE_PKGS[@]}" "${DISTRO_BASE[@]}"; do
-  install_pkg "$pkg"
-done
-
+install_all_pkgs "${BASE_PKGS[@]}" "${DISTRO_BASE[@]}"
 install_lazygit
 
 # --- 5. ZSH, KONFIGOK ÉS BINÁRISOK ---
@@ -122,5 +146,5 @@ command -v tldr &>/dev/null && tldr --update || true
 
 echo "========================================"
 echo "Kész ($PROFILE profil)!"
-(( ${#FAILED_PKGS[@]} > 0 )) && echo "Nem települt: ${FAILED_PKGS[*]}"
+(( ${#FAILED_PKGS[@]} > 0 )) && echo "Nem települt (kihagyva): ${FAILED_PKGS[*]}"
 echo "Tipp: A Zsh Powerline/Nerd Font ikonokhoz állíts be egy Nerd Fontot (pl. JetBrainsMono Nerd Font) a Windows Terminalban!"

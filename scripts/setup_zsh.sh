@@ -32,11 +32,21 @@ fi
 
 # Alapértelmezett shell átállítása zsh-ra
 TARGET_USER="$(id -un)"
-ZSH_PATH="$(command -v zsh || true)"
-if [[ -n "$ZSH_PATH" && "$SHELL" != "$ZSH_PATH" ]]; then
+if [[ -x /usr/bin/zsh ]]; then
+  ZSH_PATH="/usr/bin/zsh"
+elif [[ -x /bin/zsh ]]; then
+  ZSH_PATH="/bin/zsh"
+else
+  ZSH_PATH="$(command -v zsh || true)"
+fi
+if [[ -n "$ZSH_PATH" && "$SHELL" != "$ZSH_PATH" ]] && command -v chsh >/dev/null 2>&1; then
   if [[ "$(id -u)" -eq 0 ]]; then
     chsh -s "$ZSH_PATH" "$TARGET_USER" || echo "Megjegyzés: chsh sikertelen."
   elif command -v sudo >/dev/null 2>&1; then
-    sudo chsh -s "$ZSH_PATH" "$TARGET_USER" || echo "Megjegyzés: chsh sikertelen, állítsd át manuálisan."
+    if [[ -n "${SUDO_ASKPASS:-}" ]]; then
+      sudo -A chsh -s "$ZSH_PATH" "$TARGET_USER" || echo "Megjegyzés: chsh sikertelen, állítsd át manuálisan."
+    else
+      sudo chsh -s "$ZSH_PATH" "$TARGET_USER" || echo "Megjegyzés: chsh sikertelen, állítsd át manuálisan."
+    fi
   fi
 fi
