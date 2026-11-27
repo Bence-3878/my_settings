@@ -59,6 +59,8 @@ plugins=(
 
 )
 
+[[ -d "$HOME/.ssh" ]] || mkdir -p -m 700 "$HOME/.ssh"
+
 ZSH_DISABLE_COMPFIX="true"
 
 source "$ZSH/oh-my-zsh.sh"

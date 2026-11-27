@@ -13,6 +13,9 @@ link_file() {
   ln -sf "$src" "$dst"
 }
 
+# .ssh mappa biztosítása (oh-my-zsh ssh-agent pluginhoz)
+mkdir -p -m 700 "$HOME/.ssh"
+
 # .zshrc biztonsági mentése (ha nem symlink)
 if [[ -f "$HOME/.zshrc" && ! -L "$HOME/.zshrc" ]]; then
   mv "$HOME/.zshrc" "$HOME/.zshrc.bak"
