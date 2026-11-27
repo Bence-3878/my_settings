@@ -6,7 +6,7 @@ alias nano2='/bin/nano'
 # Alkalmazások
 alias clion='nohup ~/JetBrains/CLion/bin/clion.sh >/dev/null 2>&1 &'
 alias pycharm='nohup ~/JetBrains/pycharm/bin/pycharm.sh >/dev/null 2>&1 &'
-alias beep="mplayer \"$MY_SETTINGS_DIR/valami/done.mp3\" >/dev/null 2>&1"
+alias beep="mplayer \"$MY_SETTINGS_DIR/assets/done.mp3\" >/dev/null 2>&1"
 
 # Függvények
 #zshconfig() {
@@ -28,10 +28,10 @@ aliases() {
 # Ubuntu/Debian alatt batcat -> bat
 if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
   alias bat='batcat'
+  alias cat='batcat --paging=never'
+elif command -v bat &>/dev/null; then
+  alias cat='bat --paging=never'
 fi
-
-# Opcionális: cat kiváltása bat-tal (sima cat marad: \cat vagy /bin/cat)
-alias cat='bat --paging=never'
 
 zhelp() {
   local -A desc=(
@@ -93,5 +93,5 @@ alias -s bf='beef'
 alias -s {md,txt,json,conf}='micro'
 alias sudo='sudo '
 mkcd() {
-    mkdir -p  && cd  || return 1
+  mkdir -p -- "$1" && cd -- "$1" || return 1
 }

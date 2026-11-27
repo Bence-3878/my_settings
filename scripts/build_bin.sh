@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[[ -d "$SCRIPT_DIR/config" ]] && REPO_DIR="$SCRIPT_DIR" || REPO_DIR="$(dirname "$SCRIPT_DIR")"
 OUT_DIR="$HOME/bin"
 mkdir -p "$OUT_DIR"
 
@@ -13,7 +14,7 @@ if [[ -z "$CC" ]]; then
 fi
 
 shopt -s nullglob
-for src in "$REPO_DIR"/bin/*.c; do
+for src in "$REPO_DIR"/src/*.c "$REPO_DIR"/bin/*.c; do
   name="$(basename "$src" .c)"
   out="$OUT_DIR/$name"
 
