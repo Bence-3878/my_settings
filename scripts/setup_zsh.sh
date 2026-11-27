@@ -2,7 +2,7 @@
 set -e
 
 ZSH_DIR="${ZSH:-$HOME/.oh-my-zsh}"
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+ZSH_CUSTOM="$ZSH_DIR/custom"
 
 # Oh My Zsh telepítése (scriptet nem szakítja meg)
 if [[ ! -d "$ZSH_DIR" ]]; then

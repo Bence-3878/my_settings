@@ -33,7 +33,7 @@ link_file "$REPO_DIR/config/neofetch.conf" "$HOME/.config/neofetch/config.conf"
 link_file "$REPO_DIR/config/tmux.conf" "$HOME/.tmux.conf"
 
 # Egyéni Oh My Zsh témák
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+ZSH_CUSTOM="${HOME}/.oh-my-zsh/custom"
 mkdir -p "$ZSH_CUSTOM/themes"
 for theme in "$REPO_DIR"/zsh/themes/*.zsh-theme; do
   [[ -e "$theme" ]] || continue

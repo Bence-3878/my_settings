@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -u
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # --- 1. PROFIL KIVÁLASZTÁSA (--server | --desktop | auto) ---
 PROFILE=""
@@ -29,7 +29,7 @@ if [[ "$PROFILE" != "server" && "$PROFILE" != "desktop" ]]; then
 fi
 echo "==> Kiválasztott profil: $PROFILE"
 
-bash "$REPO_DIR/link_configs.sh" "$PROFILE"
+bash "$REPO_DIR/scripts/link_configs.sh" "$PROFILE"
 
 # --- 2. CSOMAGLISTÁK ---
 # Mindkettőre megy (RPi szerver + laptop)
@@ -49,7 +49,7 @@ SERVER_PKGS=(
 DESKTOP_PKGS=(
   gdb cowsay lolcat w3m bat
   terminator wine git-cola gufw mplayer flatpak
-  flameshot copyq meld syncthing fc-cache
+  flameshot copyq meld syncthing fontconfig
 )
 
 # Csak asztali + X11
@@ -171,7 +171,11 @@ install_uex() {
 install_lazygit() {
   command -v lazygit &>/dev/null && return 0
   local ver arch
-  ver=$(curl -fsSL "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | jq -r '.tag_name | ltrimstr("v")')
+  ver=$(curl -fsSL "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | jq -r '.tag_name | ltrimstr("v")') || true
+  if [[ -z "$ver" || "$ver" == "null" ]]; then
+    echo "lazygit: verzió lekérdezése sikertelen" >&2
+    return 0
+  fi
   case "$(uname -m)" in
     x86_64)  arch="x86_64" ;;
     aarch64) arch="arm64" ;;
@@ -239,7 +243,7 @@ fi
 
 # --- 5. ZSH ÉS KONFIGOK ---
 bash "$REPO_DIR/scripts/setup_zsh.sh"
-bash "$REPO_DIR/scripts/link_configs.sh"
+bash "$REPO_DIR/scripts/link_configs.sh" "$PROFILE"
 bash "$REPO_DIR/scripts/build_bin.sh"
 
 command -v tldr &>/dev/null && tldr --update || true

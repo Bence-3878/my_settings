@@ -95,9 +95,9 @@ prompt_context() {
   fi
 }
 
-# Rövidített mappanév (4+ szintnél)
+# Rövidített mappanév (5+ szintnél)
 prompt_dir() {
-  prompt_segment "$MY_DIR_BG" "$MY_DIR_FG" '%(4~|%-1~/…/%2~|%~)'
+  prompt_segment "$MY_DIR_BG" "$MY_DIR_FG" '%(5~|%-1~/…/%2~|%~)'
 }
 
 prompt_git() {
