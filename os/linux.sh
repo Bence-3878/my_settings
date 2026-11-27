@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -u
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # --- 1. PROFIL KIVÁLASZTÁSA (--server | --desktop | auto) ---
 PROFILE=""
@@ -14,8 +14,12 @@ case "${1:-}" in
     else
       DEFAULT_PROFILE="desktop"
     fi
-    read -rp "Profil kiválasztása [server/desktop] (alap: $DEFAULT_PROFILE): " INPUT
-    PROFILE="${INPUT:-$DEFAULT_PROFILE}"
+    if [[ -t 0 ]]; then
+      read -rp "Profil kiválasztása [server/desktop] (alap: $DEFAULT_PROFILE): " INPUT
+      PROFILE="${INPUT:-$DEFAULT_PROFILE}"
+    else
+      PROFILE="$DEFAULT_PROFILE"
+    fi
     ;;
   *)
     echo "Használat: $0 [--server | --desktop]" >&2
@@ -28,8 +32,6 @@ if [[ "$PROFILE" != "server" && "$PROFILE" != "desktop" ]]; then
   exit 1
 fi
 echo "==> Kiválasztott profil: $PROFILE"
-
-bash "$REPO_DIR/link_configs.sh" "$PROFILE"
 
 # --- 2. CSOMAGLISTÁK ---
 # Mindkettőre megy (RPi szerver + laptop)
@@ -204,6 +206,23 @@ install_nerd_font() {
   fi
 }
 
+install_antigravity() {
+  command -v antigravity &>/dev/null && return 0
+  echo "==> Google Antigravity telepítése..."
+
+  if [[ "$PM" == "apt" ]]; then
+    sudo mkdir -p /etc/apt/keyrings
+    curl -fsSL https://us-central1-apt.pkg.dev/doc/repo-signing-key.gpg \
+      | sudo gpg --dearmor --yes -o /etc/apt/keyrings/antigravity-repo-key.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/antigravity-repo-key.gpg] https://us-central1-apt.pkg.dev/projects/antigravity-auto-updater-dev/ antigravity-debian main" \
+      | sudo tee /etc/apt/sources.list.d/antigravity.list >/dev/null
+    sudo apt-get update
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y antigravity
+  else
+    echo "Figyelem: Antigravity telepítése $PM alatt manuális (antigravity.google/download/linux)." >&2
+  fi
+}
+
 # Alap csomagok (mindig)
 for pkg in "${BASE_PKGS[@]}" "${DISTRO_BASE[@]}"; do
   install_pkg "$pkg"
@@ -235,15 +254,21 @@ else
   install_uex
   install_lazygit
   install_nerd_font
+  install_antigravity
 fi
 
 # --- 5. ZSH ÉS KONFIGOK ---
 bash "$REPO_DIR/scripts/setup_zsh.sh"
-bash "$REPO_DIR/scripts/link_configs.sh"
+bash "$REPO_DIR/scripts/link_configs.sh" "$PROFILE"
 bash "$REPO_DIR/scripts/build_bin.sh"
 
 command -v tldr &>/dev/null && tldr --update || true
 
 echo "========================================"
 echo "Kész ($PROFILE profil)!"
-(( ${#FAILED_PKGS[@]} > 0 )) && echo "Nem települt: ${FAILED_PKGS[*]}"
+if (( ${#FAILED_PKGS[@]} > 0 )); then
+  echo "Nem települt: ${FAILED_PKGS[*]}"
+fi
+
+set -eE
+trap 'echo "Sikertelen parancs (${BASH_SOURCE[0]}:$LINENO): $BASH_COMMAND" >&2' ERR

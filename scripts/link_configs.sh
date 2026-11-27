@@ -35,10 +35,14 @@ link_file "$REPO_DIR/config/tmux.conf" "$HOME/.tmux.conf"
 # Egyéni Oh My Zsh témák
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 mkdir -p "$ZSH_CUSTOM/themes"
-for theme in "$REPO_DIR"/zsh/themes/*.zsh-theme; do
-  [[ -e "$theme" ]] || continue
-  ln -sf "$theme" "$ZSH_CUSTOM/themes/$(basename "$theme")"
-done
+src_themes_dir="$(cd "$REPO_DIR/zsh/themes" && pwd)"
+dst_themes_dir="$(cd "$ZSH_CUSTOM/themes" && pwd)"
+if [[ "$src_themes_dir" != "$dst_themes_dir" ]]; then
+  for theme in "$REPO_DIR"/zsh/themes/*.zsh-theme; do
+    [[ -e "$theme" ]] || continue
+    ln -sf "$theme" "$ZSH_CUSTOM/themes/$(basename "$theme")"
+  done
+fi
 
 # Desktop-specifikus konfigok
 if [[ "$PROFILE" == "desktop" ]]; then

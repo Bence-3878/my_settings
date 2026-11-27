@@ -10,6 +10,7 @@ int main(int argc, char **argv) {
 
         else if (argv[1][i] >= 'A' && argv[1][i] <= 'Z')
             a = a * 10 + argv[1][i] - 'A';
+        i++;
     }
     return a;
 }
