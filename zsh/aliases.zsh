@@ -6,7 +6,7 @@ alias nano2='/bin/nano'
 # Alkalmazások
 alias clion='nohup ~/JetBrains/CLion/bin/clion.sh >/dev/null 2>&1 &'
 alias pycharm='nohup ~/JetBrains/pycharm/bin/pycharm.sh >/dev/null 2>&1 &'
-alias beep="mplayer \"$MY_SETTINGS_DIR/valami/done.mp3\" >/dev/null 2>&1"
+alias beep="mplayer \"$MY_SETTINGS_DIR/assets/done.mp3\" >/dev/null 2>&1"
 
 # Függvények
 #zshconfig() {
@@ -93,5 +93,6 @@ alias -s bf='beef'
 alias -s {md,txt,json,conf}='micro'
 alias sudo='sudo '
 mkcd() {
-    mkdir -p  && cd  || return 1
+  [[ -n "${1:-}" ]] || return 1
+  mkdir -p -- "$1" && cd -- "$1" || return 1
 }

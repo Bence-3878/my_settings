@@ -1,0 +1,13 @@
+{
+    "autoindent": true,
+    "clipboard": "external",
+    "colorscheme": "monokai",
+    "mkparents": true,
+    "ruler": true,
+    "savecursor": true,
+    "saveundo": true,
+    "scrollbar": true,
+    "softwrap": true,
+    "tabsize": 4,
+    "tabstospaces": true
+}

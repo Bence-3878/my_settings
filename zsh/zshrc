@@ -89,3 +89,6 @@ fi
 
 [[ -f "$MY_SETTINGS_DIR/zsh/aliases.local.zsh" ]] && source "$MY_SETTINGS_DIR/zsh/aliases.local.zsh"
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
+# Added by Antigravity CLI installer
+export PATH="/home/pako/.local/bin:$PATH"
