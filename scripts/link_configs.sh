@@ -14,7 +14,7 @@ link_file() {
 }
 
 # .ssh mappa biztosítása (oh-my-zsh ssh-agent pluginhoz)
-mkdir -p -m 700 "$HOME/.ssh"
+mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
 
 # .zshrc biztonsági mentése (ha nem symlink)
 if [[ -f "$HOME/.zshrc" && ! -L "$HOME/.zshrc" ]]; then
@@ -29,6 +29,9 @@ cat << EOF > "$HOME/.my_settings_env"
 export MY_SETTINGS_DIR="$REPO_DIR"
 export MY_SETTINGS_PROFILE="$PROFILE"
 EOF
+
+# Saját frissítő szkript bekötése PATH-ba
+link_file "$REPO_DIR/scripts/update.sh" "$HOME/.local/bin/my-settings-update"
 
 # CLI konfigok (szerver + desktop)
 link_file "$REPO_DIR/config/fastfetch.jsonc" "$HOME/.config/fastfetch/config.jsonc"

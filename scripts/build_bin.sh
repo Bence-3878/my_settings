@@ -6,6 +6,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUT_DIR="$HOME/bin"
 mkdir -p "$OUT_DIR"
 
+FORCE=0
+if [[ "${1:-}" == "--force" || "${1:-}" == "-f" ]]; then
+  FORCE=1
+fi
+
 # Fordító keresése
 CC="$(command -v gcc || command -v clang || command -v cc || true)"
 if [[ -z "$CC" ]]; then
@@ -18,8 +23,8 @@ for src in "$REPO_DIR"/src/*.c "$REPO_DIR"/bin/*.c; do
   name="$(basename "$src" .c)"
   out="$OUT_DIR/$name"
 
-  # Csak akkor fordít, ha még nincs meg vagy módosult a .c fájl
-  if [[ ! -f "$out" || "$src" -nt "$out" ]]; then
+  # Alapból csak akkor fordít, ha hiányzik vagy módosult a .c fájl; --force esetén mindig
+  if (( FORCE == 1 )) || [[ ! -f "$out" || "$src" -nt "$out" ]]; then
     echo "==> Fordítás: $name ($CC)"
     "$CC" -O2 -Wall "$src" -o "$out"
   fi
