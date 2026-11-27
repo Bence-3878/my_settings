@@ -1,0 +1,46 @@
+name: Shell Tesztek
+
+on:
+  push:
+    branches: [ dev, master ]
+  pull_request:
+    branches: [ dev, master ]
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    name: ShellCheck és Bats unit tesztek
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repó letöltése
+        uses: actions/checkout@v4
+
+      - name: Tesztfüggőségek telepítése
+        run: sudo apt-get update && sudo apt-get install -y shellcheck bats zsh zip unzip
+
+      - name: Szintaxis és hibaellenőrzés (ShellCheck)
+        run: find . -name "*.sh" -not -path "./zsh/plugins/*" -not -path "./zsh/themes/*" -exec shellcheck {} +
+
+      - name: Unit tesztek futtatása (Bats)
+        run: bats tests/
+
+  docker-tests:
+    name: Docker teszt (${{ matrix.distro }})
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - ubuntu:24.04
+          - debian:bookworm
+          - fedora:latest
+          - archlinux:latest
+    steps:
+      - name: Repó letöltése
+        uses: actions/checkout@v4
+
+      - name: Rendszer-teszt futtatása (${{ matrix.distro }})
+        env:
+          DOCKER_DISTRO: ${{ matrix.distro }}
+        run: ./tests/docker_test.sh

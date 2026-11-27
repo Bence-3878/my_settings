@@ -50,3 +50,6 @@ if [[ -n "$ZSH_PATH" && "$SHELL" != "$ZSH_PATH" ]] && command -v chsh >/dev/null
     fi
   fi
 fi
+
+set -eE
+trap 'echo "Sikertelen parancs (${BASH_SOURCE[0]}:$LINENO): $BASH_COMMAND" >&2' ERR

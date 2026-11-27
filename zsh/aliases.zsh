@@ -93,5 +93,6 @@ alias -s bf='beef'
 alias -s {md,txt,json,conf}='micro'
 alias sudo='sudo '
 mkcd() {
+  [[ -n "${1:-}" ]] || return 1
   mkdir -p -- "$1" && cd -- "$1" || return 1
 }

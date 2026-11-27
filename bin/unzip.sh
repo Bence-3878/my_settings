@@ -28,11 +28,17 @@ for i in "$@"; do
       ;;
   esac
 
+  # Ellenőrizzük, hogy létezik-e a fájl
+  if [[ ! -f "$i" ]]; then
+    echo "Hiba: a fájl nem létezik: $i" >&2
+    continue
+  fi
+
   # Könyvtár és alapnév
   dir_name="$(dirname -- "$i" 2>/dev/null || dirname "$i")"
 
   # Belépés a ZIP helyére
-  if ! pushd "$dir_name" >/dev/null; then
+  if ! pushd -- "$dir_name" >/dev/null; then
     echo "Hiba: nem lehet belépni: $dir_name" >&2
     continue
   fi

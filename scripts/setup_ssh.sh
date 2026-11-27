@@ -68,3 +68,6 @@ case "$MODE" in
   both)   setup_client; setup_server ;;
   *)      echo "Használat: $0 [client|server|both]"; exit 1 ;;
 esac
+
+set -eE
+trap 'echo "Sikertelen parancs (${BASH_SOURCE[0]}:$LINENO): $BASH_COMMAND" >&2' ERR

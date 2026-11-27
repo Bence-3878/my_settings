@@ -14,8 +14,12 @@ case "${1:-}" in
     else
       DEFAULT_PROFILE="desktop"
     fi
-    read -rp "Profil kiválasztása [server/desktop] (alap: $DEFAULT_PROFILE): " INPUT
-    PROFILE="${INPUT:-$DEFAULT_PROFILE}"
+    if [[ -t 0 ]]; then
+      read -rp "Profil kiválasztása [server/desktop] (alap: $DEFAULT_PROFILE): " INPUT
+      PROFILE="${INPUT:-$DEFAULT_PROFILE}"
+    else
+      PROFILE="$DEFAULT_PROFILE"
+    fi
     ;;
   *)
     echo "Használat: $0 [--server | --desktop]" >&2
@@ -171,11 +175,7 @@ install_uex() {
 install_lazygit() {
   command -v lazygit &>/dev/null && return 0
   local ver arch
-  ver=$(curl -fsSL "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | jq -r '.tag_name | ltrimstr("v")') || true
-  if [[ -z "$ver" || "$ver" == "null" ]]; then
-    echo "lazygit: verzió lekérdezése sikertelen" >&2
-    return 0
-  fi
+  ver=$(curl -fsSL "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | jq -r '.tag_name | ltrimstr("v")')
   case "$(uname -m)" in
     x86_64)  arch="x86_64" ;;
     aarch64) arch="arm64" ;;
@@ -250,4 +250,9 @@ command -v tldr &>/dev/null && tldr --update || true
 
 echo "========================================"
 echo "Kész ($PROFILE profil)!"
-(( ${#FAILED_PKGS[@]} > 0 )) && echo "Nem települt: ${FAILED_PKGS[*]}"
+if (( ${#FAILED_PKGS[@]} > 0 )); then
+  echo "Nem települt: ${FAILED_PKGS[*]}"
+fi
+
+set -eE
+trap 'echo "Sikertelen parancs (${BASH_SOURCE[0]}:$LINENO): $BASH_COMMAND" >&2' ERR
