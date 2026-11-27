@@ -2,16 +2,21 @@
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-DISTROS=(
-    "ubuntu:24.04"
-    "debian:bookworm"
-    "fedora:latest"
-    "archlinux:latest"
-)
+if [[ -n "${DOCKER_DISTRO:-}" ]]; then
+    DISTROS=("$DOCKER_DISTRO")
+else
+    DISTROS=(
+        "ubuntu:24.04"
+        "debian:bookworm"
+        "fedora:latest"
+        "archlinux:latest"
+    )
+fi
 
 FAILED=0
 
 for distro in "${DISTROS[@]}"; do
+    echo "==> Docker teszt indítása: $distro"
     LOG_FILE="$(mktemp)"
 
     docker run --rm \
@@ -37,6 +42,8 @@ for distro in "${DISTROS[@]}"; do
         echo "[HIBA] $distro (kilépési kód: $EXIT_CODE)"
         tail -n 25 "$LOG_FILE"
         echo "----------------------------------------"
+    else
+        echo "[OK] $distro"
     fi
 
     rm -f "$LOG_FILE"
